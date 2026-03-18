@@ -27,7 +27,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://lmsclient-git-main-khushi-panus-projects.vercel.app",
+      "https://lmsclient-ruddy.vercel.app",
     ],
     credentials: true,
   })
@@ -46,7 +46,7 @@ const io = new Server(server, {
   cors: {
     origin: [
       "http://localhost:5173",
-      "https://lmsclient-git-main-khushi-panus-projects.vercel.app",
+      "https://lmsclient-ruddy.vercel.app",
     ],
     methods: ["GET", "POST"],
     credentials: true,
