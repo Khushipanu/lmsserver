@@ -30,7 +30,7 @@ router.get(
       );
 
       res.redirect(
-        "https://lmsclient-ruddy.vercel.app/auth-success?token=${token}"
+        `https://lmsclient-ruddy.vercel.app/auth-success?token=${token}`
       );
     } catch (err) {
       console.error("Google login error", err);
