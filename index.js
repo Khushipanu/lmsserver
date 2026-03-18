@@ -25,18 +25,25 @@ app.get("/", (req, res) => {
 // HTTP server create
 const server = createServer(app);
 
-// Socket.io setup
+const corsOptions = {
+  origin: true,
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "token"],
+};
+
 const io = new Server(server, {
   cors: {
-    origin: ["https://lmsclient-ruddy.vercel.app", process.env.CLIENT_URL],
+    origin: true,
+    methods: ["GET", "POST"],
+    credentials: true,
   },
 });
-app.use(
-  cors({
-    origin: ["https://lmsclient-ruddy.vercel.app", process.env.CLIENT_URL],
-    credentials: true,
-  }),
-);
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
+app.use(passport.initialize());
+
 // Razorpay instance
 export const instance = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -45,11 +52,6 @@ export const instance = new Razorpay({
 
 // Connect DB
 connectDB();
-
-// Middlewares
-app.use(express.json());
-app.use(cors());
-app.use(passport.initialize());
 
 // Static folder
 app.use("/uploads", express.static("uploads"));
