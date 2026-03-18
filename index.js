@@ -19,68 +19,75 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 5000;
 
-app.get("/", (req, res) => {
-  res.send("hi");
-});
-// HTTP server create
+
 const server = createServer(app);
 
 
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization, token"
-  );
-  res.header(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, PATCH, DELETE, OPTIONS"
-  );
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
-  }
-  next();
-});
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://lmsclient-git-main-khushi-panus-projects.vercel.app",
+    ],
+    credentials: true,
+  })
+);
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+/* ---------------- PASSPORT ---------------- */
+
+app.use(passport.initialize());
+
+/* ---------------- SOCKET.IO ---------------- */
 
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: [
+      "http://localhost:5173",
+      "https://lmsclient-git-main-khushi-panus-projects.vercel.app",
+    ],
     methods: ["GET", "POST"],
     credentials: true,
   },
 });
 
-app.use(cors());
-app.use(passport.initialize());
+/* ---------------- RAZORPAY ---------------- */
 
-// Razorpay instance
 export const instance = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
-// Connect DB
+/* ---------------- DATABASE ---------------- */
+
 connectDB();
 
-// Static folder
+/* ---------------- STATIC FILES ---------------- */
+
 app.use("/uploads", express.static("uploads"));
 
-// Routes
+/* ---------------- ROUTES ---------------- */
+
 app.use("/api", userRoutes);
 app.use("/api", courseRoutes);
 app.use("/api", adminRoutes);
 app.use("/auth", authRoutes);
 
+/* ---------------- HOME ROUTE ---------------- */
+
 app.get("/", (req, res) => {
-  res.send("hello world");
+  res.send("LMS Server Running 🚀");
 });
 
-// 404
+/* ---------------- 404 ---------------- */
+
 app.use((req, res) => {
-  res.status(404).json({ message: "req not found" });
+  res.status(404).json({ message: "Request not found" });
 });
 
-/* ---------------- SOCKET.IO ---------------- */
+/* ---------------- SOCKET LOGIC ---------------- */
 
 const chatHistory = [];
 
@@ -92,24 +99,31 @@ io.on("connection", (socket) => {
   });
 
   socket.on("ai-message", async (data) => {
-    console.log("data", data);
+    try {
+      console.log("User message:", data);
 
-    chatHistory.push({
-      role: "user",
-      parts: [{ text: data }],
-    });
+      chatHistory.push({
+        role: "user",
+        parts: [{ text: data }],
+      });
 
-    const response = await generateResponse(chatHistory);
+      const response = await generateResponse(chatHistory);
 
-    chatHistory.push({
-      role: "model",
-      parts: [{ text: response }],
-    });
+      chatHistory.push({
+        role: "model",
+        parts: [{ text: response }],
+      });
 
-    socket.emit("ai-message-response", response);
+      socket.emit("ai-message-response", response);
+    } catch (error) {
+      console.log(error);
+      socket.emit("ai-message-response", "Something went wrong");
+    }
   });
 });
 
+/* ---------------- SERVER START ---------------- */
+
 server.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  console.log(`Server running on port ${port}`);
 });
