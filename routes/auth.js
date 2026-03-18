@@ -30,12 +30,12 @@ router.get(
       );
 
       res.redirect(
-        `${process.env.CLIENT_URL}/auth-success?token=${token}`
+        "https://lmsclient-ruddy.vercel.app/auth-success?token=${token}"
       );
     } catch (err) {
       console.error("Google login error", err);
       res.redirect(
-        `${process.env.CLIENT_URL}/login?err=google_failed`
+        "https://lmsclient-ruddy.vercel.app/login?err=google_failed"
       );
     }
   }
