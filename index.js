@@ -25,23 +25,32 @@ app.get("/", (req, res) => {
 // HTTP server create
 const server = createServer(app);
 
-const corsOptions = {
-  origin: true,
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "token"],
-};
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization, token"
+  );
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+  );
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 const io = new Server(server, {
   cors: {
-    origin: true,
+    origin: "*",
     methods: ["GET", "POST"],
     credentials: true,
   },
 });
 
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+app.use(cors());
 app.use(passport.initialize());
 
 // Razorpay instance
