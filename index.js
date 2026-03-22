@@ -13,15 +13,15 @@ import userRoutes from "./routes/user.js";
 import courseRoutes from "./routes/courses.js";
 import adminRoutes from "./routes/admin.js";
 import authRoutes from "./routes/auth.js";
+import queryRoutes from "./routes/query.js";
+
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 5000;
 
-
 const server = createServer(app);
-
 
 app.use(
   cors({
@@ -74,6 +74,8 @@ app.use("/api", userRoutes);
 app.use("/api", courseRoutes);
 app.use("/api", adminRoutes);
 app.use("/auth", authRoutes);
+app.use("/api/query",queryRoutes);
+
 
 /* ---------------- HOME ROUTE ---------------- */
 

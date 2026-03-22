@@ -9,9 +9,8 @@ import { OAuth2Client } from "google-auth-library"
 import fs from "fs"
 dotenv.config();
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
 //register
-
-
 export const register=TryCatch(async(req,res)=>{
     const {email,name,password,role}=req.body;
         // basic validation
@@ -52,7 +51,6 @@ export const register=TryCatch(async(req,res)=>{
 
 export const verifyUser=TryCatch(async(req,res)=>{
     const {otp,activationToken}=req.body;
-
     const verify=jwt.verify(activationToken,process.env.ACTIVATION_SECRET);
     console.log(verify)
     if(!verify) return res.status(400).json({message:"Otp expired"})
@@ -76,9 +74,9 @@ export const verifyUser=TryCatch(async(req,res)=>{
     export const login=TryCatch(async(req,res)=>{
         const {email,password}=req.body;
         const user=await User.findOne({email});
-        if(!user) res.status(400).json({message:"user not found"});
+        if(!user) return res.status(400).json({message:"user not found"});
         const hash=user.password; //db mai already saved hai as hashed password
-        const isPassword=bcrypt.compare(password,hash);
+        const isPassword=await bcrypt.compare(password,hash);
         if(!isPassword) return res.status(400).json({message:"wrong password"})
         const token=jwt.sign({
              _id:user._id,
