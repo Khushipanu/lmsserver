@@ -14,10 +14,9 @@ const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 export const register=TryCatch(async(req,res)=>{
     const {email,name,password,role}=req.body;
         // basic validation
-        if(!email || !name || !password || !role){
+        if(!email || !name || !password){
             return res.status(400).json({message:"name, email,role  and password are required"});
         }
-        
         let user=await User.findOne({email});
         if(user) return res.status(400).json({message:"User already exists"});
 
