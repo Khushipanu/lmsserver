@@ -36,13 +36,18 @@ export const register=TryCatch(async(req,res)=>{
         const activationToken=jwt.sign({
             user, //poora obj hi daal diya isme user: name , email and password hai
             otp,
-        },process.env.ACTIVATION_SECRET,{
+        },process.env.ACTIVATION_SECRET || "fallback-secret-key",{
             expiresIn:"50d",
         })
         
         const data={name,otp};
         
-        await sendMail(email,"LMS",data)
+        // Skip email sending in production if GMAIL not configured
+        if (process.env.GMAIL && process.env.PASSWORD) {
+            await sendMail(email,"LMS",data)
+        } else {
+            console.log("Email skipped - GMAIL credentials not configured");
+        }
         
        return res.status(200).json({message:"OTP sent to your email",activationToken})
 
@@ -50,7 +55,7 @@ export const register=TryCatch(async(req,res)=>{
 
 export const verifyUser=TryCatch(async(req,res)=>{
     const {otp,activationToken}=req.body;
-    const verify=jwt.verify(activationToken,process.env.ACTIVATION_SECRET);
+    const verify=jwt.verify(activationToken,process.env.ACTIVATION_SECRET || "fallback-secret-key");
     console.log(verify)
     if(!verify) return res.status(400).json({message:"Otp expired"})
     if(verify.otp!==otp) return res.status(400).json({message:"invalid otp"})
