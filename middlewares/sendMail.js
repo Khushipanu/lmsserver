@@ -19,9 +19,7 @@ data.name → receiver ka naam (mail me “Hello Khushi” aayega)
 data.otp → OTP number jo mail me show hoga
  
  */
-import dotenv from "dotenv"
-dotenv.config()
- import {createTransport} from 'nodemailer'
+
  
 
 // const sendMail=async(email,subject,data)=>{
