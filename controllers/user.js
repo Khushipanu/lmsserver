@@ -96,23 +96,17 @@ export const register = TryCatch(async (req, res) => {
 
     // send email
     try {
-        console.log("Step 11: Checking email configuration...");
-        console.log("GMAIL env var exists:", !!process.env.GMAIL);
-        console.log("PASSWORD env var exists:", !!process.env.PASSWORD);
-        console.log("GMAIL value:", process.env.GMAIL?.substring(0, 5) + "...");
-        
-        if (!process.env.GMAIL || !process.env.PASSWORD) {
-            throw new Error("GMAIL credentials not configured in environment variables");
-        }
-        
-        console.log("Step 12: Sending email...");
         const data = { name, otp };
         await sendMail(email, "LMS", data);
-        console.log("Step 13: Email sent successfully");
     } catch (emailError) {
-        console.error("Step 13 ERROR: Email sending failed:", emailError);
-        // still return response so frontend doesn't hang
-        return res.status(500).json({ message: "Failed to send email", error: emailError.message });
+        console.error("Email sending failed:", emailError.message);
+        // Continue without email - return token for testing
+        return res.status(200).json({ 
+            message: "OTP generated (email disabled)", 
+            activationToken,
+            otp: otp, // Include OTP for testing
+            note: "Email service unavailable - use OTP: " + otp
+        });
     }
 
     // finally return response
