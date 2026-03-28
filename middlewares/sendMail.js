@@ -20,21 +20,25 @@ data.otp → OTP number jo mail me show hoga
  
  */
 
- import dotenv from "dotenv";
+import dotenv from "dotenv";
 dotenv.config();
 import { createTransport } from "nodemailer";
 
 const sendMail=async(email,subject,data)=>{
-    const transporter=createTransport({
-      host:"smtp.gmail.com",
-      port:465,
-      secure:true,
-      auth:{
-        user:process.env.GMAIL,
-        pass:process.env.PASSWORD
-      }
-    })
-    const html = `<!DOCTYPE html>
+    try {
+        console.log("🔹 Attempting to send email to:", email);
+        
+        const transporter=createTransport({
+          host:"smtp.gmail.com",
+          port:465,
+          secure:true,
+          auth:{
+            user:process.env.GMAIL,
+            pass:process.env.PASSWORD
+          }
+        })
+        
+        const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -80,17 +84,22 @@ const sendMail=async(email,subject,data)=>{
 </body>
 </html>
 `;
-await transporter.sendMail({
-    from:process.env.GMAIL,
-    to:email,  //jisko bhej rhe hai
-    subject,
-    html
-
-})
-
-
+        
+        const info = await transporter.sendMail({
+            from:process.env.GMAIL,
+            to:email,  //jisko bhej rhe hai
+            subject,
+            html
+        })
+        
+        console.log("✅ Email sent successfully:", info.messageId);
+        return info;
+        
+    } catch (error) {
+        console.error("❌ Email sending failed:", error.message);
+        throw error; // Re-throw to handle in register route
+    }
 }
-
 
 
 
