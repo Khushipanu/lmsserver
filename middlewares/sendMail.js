@@ -33,19 +33,32 @@ const sendMail = async (email, subject, data) => {
             throw new Error("GMAIL credentials not configured");
         }
         
+        // const transporter = nodemailer.createTransport({
+        //     service: 'gmail',
+        //     auth: {
+        //         user: process.env.GMAIL,
+        //         pass: process.env.PASSWORD,
+        //     },
+        // });
         const transporter = nodemailer.createTransport({
-            service: 'gmail',
+            host: "smtp.gmail.com", // Gmail SMTP server
+            port: 587,              // Use 587 for cloud servers
+            secure: false,          // false for 587
             auth: {
                 user: process.env.GMAIL,
-                pass: process.env.PASSWORD,
+                pass: process.env.PASSWORD, // 16-char App Password
             },
+            tls: {
+                rejectUnauthorized: false // avoids SSL issues on Render
+            }
         });
+
         
         const html = `<h1>OTP Verification</h1><p>Hello ${data.name}, your OTP is: <strong>${data.otp}</strong></p>`;
         
         const info = await transporter.sendMail({
-            from: process.env.GMAIL,
-            to: email,
+            from:process.env.GMAIL,
+            to:email,
             subject,
             html,
         });
@@ -65,14 +78,15 @@ const sendMail = async (email, subject, data) => {
 
 export const sendForgotMail=async(subject,data)=>{
     
-    const transporter=createTransport({
+    const transporter=nodemailer.createTransport({
       host:"smtp.gmail.com",
-      port:465,
-      secure:true,
+      port:587,
+      secure:false,
       auth:{
         user:process.env.GMAIL,
         pass:process.env.PASSWORD
-      }
+      },
+      tls:{rejectUnauthorized: false}
     })
     const html = `<!DOCTYPE html>
 <html lang="en">
