@@ -29,6 +29,7 @@ app.use(
       "http://localhost:5173",
       "https://lmsclient-ruddy.vercel.app",
     ],
+    methods:["GET","POST","PUT","DELETE"],
     credentials: true,
   })
 );
@@ -48,7 +49,7 @@ const io = new Server(server, {
       "http://localhost:5173",
       "https://lmsclient-ruddy.vercel.app",
     ],
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   },
 });
